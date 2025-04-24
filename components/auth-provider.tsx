@@ -1,11 +1,10 @@
 "use client"
 
 import type React from "react"
-import type { User } from "@/lib/local-storage"
 
 import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { addUser, getUserByEmail, initializeLocalStorage } from "@/lib/local-storage"
+import { getUserByEmail, addUser, getUserById, initializeLocalStorage, type User } from "@/lib/local-storage"
 
 type AuthContextType = {
   user: Omit<User, "password"> | null
@@ -32,11 +31,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Initialize localStorage with default data
     initializeLocalStorage()
 
-    // Check if user is logged in
-    const storedUser = localStorage.getItem("currentUser")
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
+    // Check if user is already logged in from localStorage
+    const storedUserId = localStorage.getItem("currentUserId")
+    if (storedUserId) {
+      const foundUser = getUserById(storedUserId)
+      if (foundUser) {
+        // Remove password from user object for security
+        const { password, ...safeUser } = foundUser
+        setUser(safeUser)
+      } else {
+        // Clear invalid user ID
+        localStorage.removeItem("currentUserId")
+      }
     }
+
     setLoading(false)
   }, [])
 
@@ -49,14 +57,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error("Invalid credentials")
       }
 
-      const { password: _, ...userWithoutPassword } = foundUser
-      setUser(userWithoutPassword)
-      localStorage.setItem("currentUser", JSON.stringify(userWithoutPassword))
+      // Store user ID in localStorage
+      localStorage.setItem("currentUserId", foundUser.id)
+
+      // Remove password from user object for security
+      const { password: _, ...safeUser } = foundUser
+      setUser(safeUser)
 
       // Redirect based on role
-      if (userWithoutPassword.role === "admin") {
+      if (foundUser.role === "admin") {
         router.push("/admin/dashboard")
-      } else if (userWithoutPassword.role === "distributor") {
+      } else if (foundUser.role === "distributor") {
         router.push("/distributor/dashboard")
       } else {
         router.push("/customer/dashboard")
@@ -85,16 +96,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password: userData.password,
         role: userData.role || "customer",
         distributorId: userData.distributorId,
+        address: userData.address,
+        phone: userData.phone,
       })
 
-      const { password: _, ...userWithoutPassword } = newUser
-      setUser(userWithoutPassword)
-      localStorage.setItem("currentUser", JSON.stringify(userWithoutPassword))
+      // Store user ID in localStorage
+      localStorage.setItem("currentUserId", newUser.id)
+
+      // Remove password from user object for security
+      const { password: _, ...safeUser } = newUser
+      setUser(safeUser)
 
       // Redirect based on role
-      if (userWithoutPassword.role === "admin") {
+      if (newUser.role === "admin") {
         router.push("/admin/dashboard")
-      } else if (userWithoutPassword.role === "distributor") {
+      } else if (newUser.role === "distributor") {
         router.push("/distributor/dashboard")
       } else {
         router.push("/customer/dashboard")
@@ -108,12 +124,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const logout = () => {
+    localStorage.removeItem("currentUserId")
     setUser(null)
-    localStorage.removeItem("currentUser")
     router.push("/")
   }
 
-  return <AuthContext.Provider value={{ user, loading, login, register, logout }}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        register,
+        logout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
 export const useAuth = () => useContext(AuthContext)

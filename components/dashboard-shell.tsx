@@ -5,22 +5,22 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import {
-  BarChart3,
-  Droplet,
-  LayoutDashboard,
-  LogOut,
-  Menu,
-  Package,
-  Settings,
-  ShoppingCart,
-  Truck,
-  Users,
-} from "lucide-react"
+import { CreditCard, Droplet, LayoutDashboard, LogOut, Menu, Package, Settings, ShoppingCart, User } from "lucide-react"
 import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { NotificationsPopover } from "@/components/notifications-popover"
 
 interface DashboardShellProps {
   children: React.ReactNode
@@ -30,6 +30,27 @@ export function DashboardShell({ children }: DashboardShellProps) {
   const { user, logout } = useAuth()
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
+  const [cartItemsCount, setCartItemsCount] = useState(0)
+
+  // Load cart items from localStorage
+  useEffect(() => {
+    if (user) {
+      const cartItems = localStorage.getItem(`cart_${user.id}`)
+      if (cartItems) {
+        try {
+          const parsedCart = JSON.parse(cartItems)
+          // Calculate total quantity of items in cart
+          const totalItems = Array.isArray(parsedCart)
+            ? parsedCart.reduce((count, item) => count + (item.quantity || 0), 0)
+            : 0
+          setCartItemsCount(totalItems)
+        } catch (error) {
+          console.error("Error parsing cart items:", error)
+          setCartItemsCount(0)
+        }
+      }
+    }
+  }, [user, pathname])
 
   // Close mobile nav when path changes
   useEffect(() => {
@@ -49,26 +70,12 @@ export function DashboardShell({ children }: DashboardShellProps) {
 
   // Define navigation items based on user role
   const getNavItems = () => {
-    const baseItems = [
-      {
-        title: "Dashboard",
-        href: `/${user.role}/dashboard`,
-        icon: LayoutDashboard,
-      },
-      {
-        title: "Settings",
-        href: `/${user.role}/settings`,
-        icon: Settings,
-      },
-    ]
-
     if (user.role === "admin") {
       return [
-        ...baseItems,
         {
-          title: "Distributors",
-          href: "/admin/distributors",
-          icon: Truck,
+          title: "Dashboard",
+          href: "/admin/dashboard",
+          icon: LayoutDashboard,
         },
         {
           title: "Products",
@@ -76,48 +83,52 @@ export function DashboardShell({ children }: DashboardShellProps) {
           icon: Package,
         },
         {
-          title: "Orders",
-          href: "/admin/orders",
-          icon: ShoppingCart,
-        },
-        {
-          title: "Reports",
-          href: "/admin/reports",
-          icon: BarChart3,
+          title: "Settings",
+          href: "/admin/settings",
+          icon: Settings,
         },
       ]
     } else if (user.role === "distributor") {
       return [
-        ...baseItems,
         {
-          title: "Customers",
-          href: "/distributor/customers",
-          icon: Users,
-        },
-        {
-          title: "Orders",
-          href: "/distributor/orders",
-          icon: ShoppingCart,
+          title: "Dashboard",
+          href: "/distributor/dashboard",
+          icon: LayoutDashboard,
         },
         {
           title: "Products",
           href: "/distributor/products",
           icon: Package,
         },
+        {
+          title: "Settings",
+          href: "/distributor/settings",
+          icon: Settings,
+        },
       ]
     } else {
       // Customer
       return [
-        ...baseItems,
         {
           title: "Products",
           href: "/customer/products",
           icon: Package,
         },
         {
-          title: "My Orders",
-          href: "/customer/orders",
+          title: "Cart",
+          href: "/customer/cart",
           icon: ShoppingCart,
+          badge: cartItemsCount > 0 ? cartItemsCount : undefined,
+        },
+        {
+          title: "Orders",
+          href: "/customer/orders",
+          icon: CreditCard,
+        },
+        {
+          title: "Profile",
+          href: "/customer/settings",
+          icon: User,
         },
       ]
     }
@@ -153,6 +164,9 @@ export function DashboardShell({ children }: DashboardShellProps) {
                 >
                   <item.icon className="h-5 w-5" />
                   {item.title}
+                  {item.badge && (
+                    <Badge className="ml-auto h-6 w-6 justify-center rounded-full p-0">{item.badge}</Badge>
+                  )}
                 </Link>
               ))}
               <Button
@@ -171,15 +185,44 @@ export function DashboardShell({ children }: DashboardShellProps) {
           <span className="font-bold">PetroManage</span>
         </Link>
         <div className="ml-auto flex items-center gap-2">
-          <div className="hidden md:flex">
-            <p className="text-sm font-medium">
-              Welcome, {user.name} ({user.role})
-            </p>
-          </div>
-          <Button variant="ghost" size="icon" onClick={logout}>
-            <LogOut className="h-5 w-5" />
-            <span className="sr-only">Logout</span>
-          </Button>
+          {user.role === "customer" && (
+            <Link href="/customer/cart">
+              <Button variant="ghost" size="icon" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {cartItemsCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 justify-center rounded-full p-0">
+                    {cartItemsCount}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
+          )}
+
+          <NotificationsPopover />
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>
+                <div className="flex flex-col">
+                  <span>{user.name}</span>
+                  <span className="text-xs text-muted-foreground">{user.email}</span>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href={`/${user.role}/settings`}>Profile Settings</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
       <div className="grid flex-1 md:grid-cols-[220px_1fr]">
@@ -195,7 +238,8 @@ export function DashboardShell({ children }: DashboardShellProps) {
                 )}
               >
                 <item.icon className="h-4 w-4" />
-                {item.title}
+                <span>{item.title}</span>
+                {item.badge && <Badge className="ml-auto h-5 w-5 justify-center rounded-full p-0">{item.badge}</Badge>}
               </Link>
             ))}
           </nav>

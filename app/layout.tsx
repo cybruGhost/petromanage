@@ -11,7 +11,6 @@ export const metadata: Metadata = {
   title: "Petroleum Product Management System",
   description:
     "A comprehensive system for managing petroleum products across customers, distributors, and administrators",
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({
