@@ -92,7 +92,15 @@ Then run:
 ```bash
 pnpm start
 ```
-
+```bash
+pnpm dev
+```
+  ```bash
+NPM RUN DEV
+   ```
+  ```bash
+npm run build/start
+   ```
 ---
 
 ## 🤝 Contributing
