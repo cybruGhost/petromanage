@@ -7,7 +7,7 @@
 
 A web-based management system designed to streamline operations across administrators, distributors, and customers in the petroleum industry.
 
-Built with **Next.js**, **TypeScript**, **Tailwind CSS**, and modern UI components for a powerful user experience.
+Built with **Next.js**, **TypeScript**,rEACTJS **Tailwind CSS**, and modern UI components for a powerful user experience.
 
 ---
 
