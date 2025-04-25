@@ -45,6 +45,9 @@ Make sure you have the following installed:
    ```bash
    pnpm install
    ```
+  ```bash
+   npm install
+   ```
 
 ---
 
@@ -53,6 +56,12 @@ Make sure you have the following installed:
 ```bash
 pnpm dev
 ```
+  ```bash
+NPM RUN DEV
+   ```
+  ```bash
+npm run build/start
+   ```
 
 Visit [http://localhost:3000](http://localhost:3000) to view the app in your browser.
 
