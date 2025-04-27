@@ -7,7 +7,7 @@
 
 A web-based management system designed to streamline operations across administrators, distributors, and customers in the petroleum industry.
 
-Built with **Next.js**, **TypeScript**, **Tailwind CSS**, and modern UI components for a powerful user experience.
+Built with **Next.js**, **TypeScript**,rEACTJS **Tailwind CSS**, and modern UI components for a powerful user experience.
 
 ---
 
@@ -45,6 +45,9 @@ Make sure you have the following installed:
    ```bash
    pnpm install
    ```
+  ```bash
+   npm install
+   ```
 
 ---
 
@@ -53,6 +56,12 @@ Make sure you have the following installed:
 ```bash
 pnpm dev
 ```
+  ```bash
+NPM RUN DEV
+   ```
+  ```bash
+npm run build/start
+   ```
 
 Visit [http://localhost:3000](http://localhost:3000) to view the app in your browser.
 
@@ -83,7 +92,15 @@ Then run:
 ```bash
 pnpm start
 ```
-
+```bash
+pnpm dev
+```
+  ```bash
+NPM RUN DEV
+   ```
+  ```bash
+npm run build/start
+   ```
 ---
 
 ## 🤝 Contributing
