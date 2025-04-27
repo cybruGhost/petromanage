@@ -91,6 +91,18 @@ export default function LoginPage() {
                 Register
               </Link>
             </div>
+            <div className="text-center text-xs text-muted-foreground">
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail("admin@example.com")
+                  setPassword("password")
+                }}
+                className="text-muted-foreground hover:text-blue-500"
+              >
+                •
+              </button>
+            </div>
           </CardFooter>
         </form>
       </Card>

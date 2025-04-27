@@ -25,6 +25,7 @@ export default function CustomerCart() {
   const [shippingAddress, setShippingAddress] = useState("")
   const [orderNotes, setOrderNotes] = useState("")
   const [isCheckingOut, setIsCheckingOut] = useState(false)
+  const [showShippingForm, setShowShippingForm] = useState(false)
   const [newOrder, setNewOrder] = useState<any>(null)
 
   useEffect(() => {
@@ -72,7 +73,7 @@ export default function CustomerCart() {
     setCart(cart.filter((item) => item.product.id !== productId))
   }
 
-  const handleCheckout = () => {
+  const handleProceedToCheckout = () => {
     if (cart.length === 0) {
       toast({
         title: "Empty Cart",
@@ -82,6 +83,10 @@ export default function CustomerCart() {
       return
     }
 
+    setShowShippingForm(true)
+  }
+
+  const handleProceedToPayment = () => {
     if (!shippingAddress) {
       toast({
         title: "Shipping Address Required",
@@ -118,6 +123,7 @@ export default function CustomerCart() {
 
     setNewOrder(order)
     setIsCheckingOut(true)
+    setShowShippingForm(false)
   }
 
   const handlePaymentSuccess = () => {
@@ -247,39 +253,52 @@ export default function CustomerCart() {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" onClick={handleCheckout}>
+                  <Button
+                    className="w-full"
+                    onClick={handleProceedToCheckout}
+                    disabled={showShippingForm || isCheckingOut}
+                  >
                     Proceed to Checkout
                   </Button>
                 </CardFooter>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Shipping Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="shippingAddress">Shipping Address</Label>
-                    <Textarea
-                      id="shippingAddress"
-                      value={shippingAddress}
-                      onChange={(e) => setShippingAddress(e.target.value)}
-                      placeholder="Enter your shipping address"
-                      rows={3}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="orderNotes">Order Notes (Optional)</Label>
-                    <Textarea
-                      id="orderNotes"
-                      value={orderNotes}
-                      onChange={(e) => setOrderNotes(e.target.value)}
-                      placeholder="Any special instructions for your order"
-                      rows={2}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+              {showShippingForm && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Shipping Information</CardTitle>
+                    <CardDescription>Please provide your shipping details</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="shippingAddress">Shipping Address *</Label>
+                      <Textarea
+                        id="shippingAddress"
+                        value={shippingAddress}
+                        onChange={(e) => setShippingAddress(e.target.value)}
+                        placeholder="Enter your shipping address"
+                        rows={3}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="orderNotes">Order Notes (Optional)</Label>
+                      <Textarea
+                        id="orderNotes"
+                        value={orderNotes}
+                        onChange={(e) => setOrderNotes(e.target.value)}
+                        placeholder="Any special instructions for your order"
+                        rows={2}
+                      />
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button className="w-full" onClick={handleProceedToPayment}>
+                      Proceed to Payment
+                    </Button>
+                  </CardFooter>
+                </Card>
+              )}
             </div>
           </div>
         )}

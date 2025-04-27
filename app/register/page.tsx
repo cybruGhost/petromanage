@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 
 export default function RegisterPage() {
@@ -20,13 +21,14 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
     role: "customer",
-    distributorCode: "",
+    address: "",
+    phone: "",
   })
   const [isLoading, setIsLoading] = useState(false)
   const { register } = useAuth()
   const { toast } = useToast()
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
@@ -50,20 +52,13 @@ export default function RegisterPage() {
     }
 
     try {
-      // For customer role, we would validate the distributor code here
-      // and associate the customer with the distributor
-      let distributorId
-      if (formData.role === "customer" && formData.distributorCode) {
-        // Mock validation - in a real app, this would verify against the database
-        distributorId = "2" // Mock distributor ID
-      }
-
       await register({
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        role: formData.role as "customer" | "distributor" | "admin",
-        distributorId,
+        role: formData.role as "customer" | "distributor",
+        address: formData.address,
+        phone: formData.phone,
       })
 
       toast({
@@ -139,6 +134,27 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number (Optional)</Label>
+              <Input
+                id="phone"
+                name="phone"
+                placeholder="+1 (555) 123-4567"
+                value={formData.phone}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="address">Shipping Address (Optional)</Label>
+              <Textarea
+                id="address"
+                name="address"
+                placeholder="Enter your shipping address"
+                value={formData.address}
+                onChange={handleChange}
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
               <Label>Account Type</Label>
               <RadioGroup value={formData.role} onValueChange={handleRoleChange} className="flex flex-col space-y-1">
                 <div className="flex items-center space-x-2">
@@ -149,29 +165,8 @@ export default function RegisterPage() {
                   <RadioGroupItem value="distributor" id="distributor" />
                   <Label htmlFor="distributor">Distributor</Label>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="admin" id="admin" />
-                  <Label htmlFor="admin">Administrator</Label>
-                </div>
               </RadioGroup>
             </div>
-
-            {formData.role === "customer" && (
-              <div className="space-y-2">
-                <Label htmlFor="distributorCode">Distributor Code</Label>
-                <Input
-                  id="distributorCode"
-                  name="distributorCode"
-                  placeholder="Enter your distributor's code"
-                  value={formData.distributorCode}
-                  onChange={handleChange}
-                  required
-                />
-                <p className="text-xs text-muted-foreground">
-                  You must have a valid distributor code to register as a customer.
-                </p>
-              </div>
-            )}
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={isLoading}>

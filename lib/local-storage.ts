@@ -495,11 +495,6 @@ export const getDistributors = (): User[] => {
   return getUsers().filter((user) => user.role === "distributor")
 }
 
-// Generate a distributor code (for customer registration)
-export const generateDistributorCode = (distributorId: string): string => {
-  return `${distributorId}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
-}
-
 // Format currency
 export const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat("en-US", {
@@ -515,4 +510,9 @@ export const formatDate = (dateString: string): string => {
     month: "long",
     day: "numeric",
   })
+}
+
+// Generate distributor code
+export const generateDistributorCode = (distributorId: string): string => {
+  return `DIST-${distributorId.substring(0, 4).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
 }

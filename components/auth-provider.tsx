@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (foundUser.role === "distributor") {
         router.push("/distributor/dashboard")
       } else {
-        router.push("/customer/dashboard")
+        router.push("/customer/products")
       }
     } catch (error) {
       console.error("Login failed:", error)
@@ -113,7 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (newUser.role === "distributor") {
         router.push("/distributor/dashboard")
       } else {
-        router.push("/customer/dashboard")
+        router.push("/customer/products")
       }
     } catch (error) {
       console.error("Registration failed:", error)
