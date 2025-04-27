@@ -7,16 +7,28 @@ import { useAuth } from "@/components/auth-provider"
 import { DashboardShell } from "@/components/dashboard-shell"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import {
   formatCurrency,
   formatDate,
   getOrdersByDistributorId,
   getPaymentByOrderId,
   updateOrder,
+  getUserById,
 } from "@/lib/local-storage"
-import type { Order, OrderStatus, Payment } from "@/lib/local-storage"
+import type { Order, OrderStatus, Payment, User } from "@/lib/local-storage"
 import { useToast } from "@/hooks/use-toast"
 
 export default function DistributorOrders() {
@@ -25,7 +37,14 @@ export default function DistributorOrders() {
   const { toast } = useToast()
   const [orders, setOrders] = useState<Order[]>([])
   const [payments, setPayments] = useState<Record<string, Payment>>({})
-  const [activeTab, setActiveTab] = useState<"all" | "pending" | "processing" | "in_transit" | "delivered">("all")
+  const [customers, setCustomers] = useState<Record<string, User>>({})
+  const [activeTab, setActiveTab] = useState<"all" | "pending_payment" | "processing" | "in_transit" | "delivered">(
+    "all",
+  )
+  const [isNoteDialogOpen, setIsNoteDialogOpen] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [customerNote, setCustomerNote] = useState("")
+  const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
     if (user) {
@@ -35,13 +54,22 @@ export default function DistributorOrders() {
 
       // Load payments for each order
       const orderPayments: Record<string, Payment> = {}
+      const orderCustomers: Record<string, User> = {}
+
       distributorOrders.forEach((order) => {
         const payment = getPaymentByOrderId(order.id)
         if (payment) {
           orderPayments[order.id] = payment
         }
+
+        const customer = getUserById(order.customerId)
+        if (customer) {
+          orderCustomers[order.customerId] = customer
+        }
       })
+
       setPayments(orderPayments)
+      setCustomers(orderCustomers)
     }
   }, [user])
 
@@ -98,10 +126,46 @@ export default function DistributorOrders() {
     })
   }
 
+  const handleAddNote = (order: Order) => {
+    setSelectedOrder(order)
+    setCustomerNote(order.notes || "")
+    setIsNoteDialogOpen(true)
+  }
+
+  const handleSaveNote = () => {
+    if (!selectedOrder) return
+
+    const updatedOrder = { ...selectedOrder, notes: customerNote }
+    updateOrder(updatedOrder)
+
+    setOrders(orders.map((order) => (order.id === selectedOrder.id ? updatedOrder : order)))
+
+    toast({
+      title: "Note Saved",
+      description: "Customer note has been updated successfully.",
+    })
+
+    setIsNoteDialogOpen(false)
+  }
+
   const filteredOrders = orders
     .filter((order) => {
-      if (activeTab === "all") return true
-      return order.status === activeTab
+      // Filter by tab
+      if (activeTab !== "all" && order.status !== activeTab) return false
+
+      // Filter by search query
+      if (searchQuery) {
+        const customer = customers[order.customerId]
+        const searchLower = searchQuery.toLowerCase()
+
+        return (
+          order.id.toLowerCase().includes(searchLower) ||
+          order.customerName.toLowerCase().includes(searchLower) ||
+          (customer?.email && customer.email.toLowerCase().includes(searchLower))
+        )
+      }
+
+      return true
     })
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
@@ -115,6 +179,13 @@ export default function DistributorOrders() {
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold tracking-tight">Order Management</h1>
+          <div className="w-64">
+            <Input
+              placeholder="Search orders..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-4">
@@ -176,6 +247,9 @@ export default function DistributorOrders() {
                       <SelectItem value="cancelled">Cancelled</SelectItem>
                     </SelectContent>
                   </Select>
+                  <Button variant="outline" size="sm" onClick={() => handleAddNote(order)}>
+                    Add Note
+                  </Button>
                   <Button variant="outline" size="sm" onClick={() => handleGenerateInvoice(order)}>
                     <FileText className="mr-2 h-4 w-4" />
                     Invoice
@@ -213,15 +287,19 @@ export default function DistributorOrders() {
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <h3 className="font-semibold mb-2">Shipping Information</h3>
+                      <h3 className="font-semibold mb-2">Customer Information</h3>
                       <div className="text-sm border rounded-md p-3">
-                        <p className="whitespace-pre-line">{order.shippingAddress}</p>
-                        {order.notes && (
-                          <div className="mt-2">
-                            <p className="font-medium">Notes:</p>
-                            <p>{order.notes}</p>
-                          </div>
+                        <p className="font-medium">{order.customerName}</p>
+                        {customers[order.customerId] && (
+                          <>
+                            <p>Email: {customers[order.customerId].email}</p>
+                            {customers[order.customerId].phone && <p>Phone: {customers[order.customerId].phone}</p>}
+                          </>
                         )}
+                        <div className="mt-2">
+                          <p className="font-medium">Shipping Address:</p>
+                          <p className="whitespace-pre-line">{order.shippingAddress}</p>
+                        </div>
                       </div>
                     </div>
 
@@ -255,6 +333,18 @@ export default function DistributorOrders() {
                   </div>
                 </div>
 
+                {order.notes && (
+                  <div className="mt-4 border rounded-md p-4 bg-muted/50">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">Customer Notes</h3>
+                      <Button variant="ghost" size="sm" onClick={() => handleAddNote(order)}>
+                        Edit
+                      </Button>
+                    </div>
+                    <p className="mt-2 text-sm">{order.notes}</p>
+                  </div>
+                )}
+
                 {order.status === "in_transit" && (
                   <div className="mt-4 border rounded-md p-4 bg-muted/50">
                     <div className="flex items-center">
@@ -272,6 +362,35 @@ export default function DistributorOrders() {
             </Card>
           ))
         )}
+
+        <Dialog open={isNoteDialogOpen} onOpenChange={setIsNoteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Customer Note</DialogTitle>
+              <DialogDescription>
+                Add or update notes for this order. These notes will be visible to the customer.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="customer-note">Note</Label>
+                <Textarea
+                  id="customer-note"
+                  value={customerNote}
+                  onChange={(e) => setCustomerNote(e.target.value)}
+                  rows={5}
+                  placeholder="Enter notes for the customer..."
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsNoteDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveNote}>Save Note</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardShell>
   )

@@ -5,7 +5,21 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { CreditCard, Droplet, LayoutDashboard, LogOut, Menu, Package, Settings, ShoppingCart, User } from "lucide-react"
+import {
+  BarChart3,
+  CreditCard,
+  Droplet,
+  FileText,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Package,
+  Settings,
+  ShoppingCart,
+  Truck,
+  User,
+  Users,
+} from "lucide-react"
 import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -83,6 +97,21 @@ export function DashboardShell({ children }: DashboardShellProps) {
           icon: Package,
         },
         {
+          title: "Distributors",
+          href: "/admin/distributors",
+          icon: Truck,
+        },
+        {
+          title: "Reports",
+          href: "/admin/reports",
+          icon: FileText,
+        },
+        {
+          title: "Analytics",
+          href: "/admin/analytics",
+          icon: BarChart3,
+        },
+        {
           title: "Settings",
           href: "/admin/settings",
           icon: Settings,
@@ -99,6 +128,16 @@ export function DashboardShell({ children }: DashboardShellProps) {
           title: "Products",
           href: "/distributor/products",
           icon: Package,
+        },
+        {
+          title: "Customers",
+          href: "/distributor/customers",
+          icon: Users,
+        },
+        {
+          title: "Orders",
+          href: "/distributor/orders",
+          icon: ShoppingCart,
         },
         {
           title: "Settings",

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { FileText, Truck } from "lucide-react"
+import { Download, Truck } from "lucide-react"
 import { useAuth } from "@/components/auth-provider"
 import { DashboardShell } from "@/components/dashboard-shell"
 import { Badge } from "@/components/ui/badge"
@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { formatCurrency, formatDate, getOrdersByCustomerId, getPaymentByOrderId } from "@/lib/local-storage"
 import type { Order, Payment } from "@/lib/local-storage"
+import { generateInvoicePDF } from "@/lib/invoice-generator"
 
 export default function CustomerOrders() {
   const { user } = useAuth()
@@ -115,8 +116,8 @@ export default function CustomerOrders() {
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
   const handleGenerateInvoice = (order: Order) => {
-    // In a real app, this would generate a PDF invoice
-    alert(`Invoice for Order #${order.id} would be generated here.`)
+    const payment = payments[order.id]
+    generateInvoicePDF(order, payment, user)
   }
 
   return (
@@ -157,8 +158,8 @@ export default function CustomerOrders() {
                 <div className="flex items-center gap-4">
                   <Badge className={`${getStatusColor(order.status)} text-white`}>{getStatusLabel(order.status)}</Badge>
                   <Button variant="outline" size="sm" onClick={() => handleGenerateInvoice(order)}>
-                    <FileText className="mr-2 h-4 w-4" />
-                    Invoice
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Invoice
                   </Button>
                 </div>
               </CardHeader>
