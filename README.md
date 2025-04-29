@@ -112,10 +112,7 @@ npm run build/start
 5. Open a Pull Request
 
 ---
-
-## 📄 License
-
-This project is licensed under the MIT License.
+for now it has no backend
 
 ---
 
