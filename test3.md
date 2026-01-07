@@ -1,3 +1,4 @@
+
 🎵 Cubic Music
 <p align="center"> <img src="https://github.com/user-attachments/assets/38573f27-38ac-474a-be9f-6c0d7f1f6eeb" width="800" alt="Cubic Music Banner"/> </p><p align="center"> <strong>✨ Professional Streaming Experience Meets Modern Design</strong><br> A powerful, multilingual YouTube Music frontend for Android featuring streaming, full downloads, and stunning visuals </p><p align="center"> <a href="https://github.com/cybruGhost/Cubic-Music/releases/latest"> <img src="https://img.shields.io/badge/Latest_Version-v1.7.5-C41E3A?style=for-the-badge&logo=github" alt="Latest Version"> </a> <a href="https://github.com/cybruGhost/Cubic-Music/releases"> <img src="https://img.shields.io/badge/Total_Downloads-10k+-C41E3A?style=for-the-badge&logo=download" alt="Total Downloads"> </a> <a href="https://www.gnu.org/licenses/gpl-3.0"> <img src="https://img.shields.io/badge/License-GPL_v3-C41E3A?style=for-the-badge&logo=gnu" alt="License"> </a> <a href="https://crowdin.com/project/N-Zik"> <img src="https://badges.crowdin.net/N-Zik/localized.svg" alt="Localization"> </a> </p>
 ❤️ Support the Project
@@ -31,3 +32,85 @@ Your music. Your stats. Your story — ready to relive and share.
 
 ✨ Key Features
 🎧 Core Features
+✅ Smart Caching for offline listening
+
+✅ Batch Downloads of songs & playlists
+
+✅ Offline Mode without internet
+
+✅ Background Playback
+
+✅ Listening Statistics & History
+
+✅ Audio Visualizer with multiple styles
+
+📝 Lyrics & Playlists
+✅ Lyrics (fetch, edit, translate)
+
+✅ Playlist Management
+
+✅ Import backups from RiMusic
+
+✅ Spotify Playlists Support
+
+✅ Explicit Content Tags
+
+✅ Comments Feature
+
+🎨 Customization
+✅ Dynamic Themes
+
+✅ Sleep Timer (fully customizable)
+
+✅ Playback speed control
+
+✅ Pitch adjustment
+
+✅ Volume normalization
+
+✅ Skip silence toggle
+
+📱 Platform Support
+✅ Widget Support (experimental)
+
+✅ Android Auto & TV Support
+
+✅ Fixed on-device performance
+
+✅ Check for Updates toggle
+
+✅ Export settings & media
+
+✅ Multi-language support
+
+📊 Live Statistics
+📥 Real-time Download Tracking
+<p align="center"> <a href="https://github.com/cybruGhost/Cubic-Music/releases"> <img src="https://img.shields.io/github/downloads/cybruGhost/Cubic-Music/total?label=All-Time+Downloads&color=C41E3A" alt="Total Downloads"><br> <small>Every download ever made</small> </a> &nbsp;&nbsp;&nbsp; <a href="https://github.com/cybruGhost/Cubic-Music/releases/latest"> <img src="https://img.shields.io/github/downloads/cybruGhost/Cubic-Music/latest/total?label=v1.7.5+Downloads&color=C41E3A" alt="Latest Release Downloads"><br> <small>v1.7.5 downloads only</small> </a> </p>
+🔧 API Status
+<p align="center"> <img src="https://img.shields.io/badge/dynamic/json?label=API&query=$.0.type&url=https://yt.omada.cafe/api/v1/search?q=test&color=C41E3A&labelColor=black" alt="API Status"> <img src="https://img.shields.io/badge/dynamic/json?label=Search&query=$.0.type&prefix=OK&url=https://yt.omada.cafe/api/v1/search?q=test&color=C41E3A&labelColor=black" alt="Search"> <img src="https://img.shields.io/badge/dynamic/json?label=Results&query=$.length&url=https://yt.omada.cafe/api/v1/search?q=test&color=C41E3A&labelColor=black" alt="Results"> </p>
+🛠 Roadmap
+Improved playlist mood detection
+
+Optimize memory for large cache
+
+Fix UI to be more like RiMusic
+
+Add general improvements
+
+Expand localization support
+
+📋 Playlist Format Support
+Format	Type	Status
+🧩 Native App Format	CSV with MediaId	✅ Direct Import
+🎧 Spotify Export	Spotify CSV	🔄 YouTube API Conversion
+💽 Exportify Format	Enhanced CSV	🔄 YouTube API Conversion
+🪶 Custom Format	Minimal CSV	✅ Direct Import
+⚖️ Legal & Disclaimer
+Legal Notice
+Cubic Music respects music copyrights and does not enable illegal downloads. All content is streamed via licensed APIs or legitimate external sources only.
+
+Disclaimer
+This project is not affiliated with, endorsed by, or sponsored by YouTube, Google LLC, or their affiliates. All trademarks and intellectual property belong to their respective owners.
+
+<p align="center"> <strong>Made with ❤️ by a learner</strong><br><br> <a href="https://github.com/cybruGhost"> <img src="https://img.shields.io/badge/👻_cybruGhost-C41E3A?style=for-the-badge&logo=github&logoColor=white" alt="cybruGhost"> </a><br><br> <strong>⭐ Don't forget to star and follow for updates! 🚀</strong> </p>
+Key Points:
